@@ -1,0 +1,20 @@
+const productSchema = new mongoose.Schema({
+  product_id: Number,
+  question_body: String,
+  question_date: Date,
+  question_askwer: String,
+  question_helpfulness
+  answers: [
+    answer_id: Number,
+    answer_body: String,
+    answer_date: Date,
+    answerer_name: String,
+    answer_helpfulness: Number,
+    photos: [
+      {
+        id: Number,
+        url: String
+      }
+    ]
+  ]
+});
