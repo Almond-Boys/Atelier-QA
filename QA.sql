@@ -1,15 +1,12 @@
-DROP DATABASE IF EXISTS QA;
-CREATE DATABASE QA;
-
-USE QA;
-
 CREATE TABLE questions (
  id BIGSERIAL,
  product_id INTEGER,
- question_body VARCHAR,
- question_date DATE,
- question_asker VARCHAR,
- question_helpfulness INTEGER
+ question_body VARCHAR(255),
+ question_date BIGINT,
+ question_asker VARCHAR(100),
+ question_helpfulness INTEGER DEFAULT 0,
+ CHECK (question_helpfulness > 0),
+ question_reported BOOLEAN DEFAULT 'FALSE'
 );
 
 
@@ -17,9 +14,10 @@ ALTER TABLE questions ADD CONSTRAINT questions_pkey PRIMARY KEY (id);
 
 CREATE TABLE answers (
  id BIGSERIAL,
- answer_body VARCHAR,
- answer_date DATE,
- answer_helpfulness INTEGER,
+ answer_body VARCHAR(255),
+ answer_date BIGINT,
+ answer_helpfulness INTEGER DEFAULT 0,
+ CHECK (answer_helpfulness > 0),
  question_id INTEGER
 );
 
@@ -29,7 +27,7 @@ ALTER TABLE answers ADD CONSTRAINT answers_pkey PRIMARY KEY (id);
 CREATE TABLE photos (
  id BIGSERIAL,
  answer_id INTEGER,
- url VARCHAR
+ url VARCHAR(255)
 );
 
 
