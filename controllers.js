@@ -170,3 +170,12 @@ module.exports = {
   reportQuestion: reportQuestion,
   reportAnswer: reportAnswer,
 };
+
+/*
+GOALS TODAY:
+benchmark for query
+stress testing
+day and a half to deploy left
+deploy by midday thursday
+
+*/
