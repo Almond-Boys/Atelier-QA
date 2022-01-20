@@ -5,7 +5,7 @@ const getQuestions = (req, res) => {
     if (err) {
       throw err;
     } else {
-      res.send(data);
+      res.send(data[0]);
     }
   }, req);
 };
@@ -17,7 +17,7 @@ const getAnswers = (req, res) => {
     } else {
       res.send(data);
     }
-  });
+  }, req);
 };
 
 const postQuestion = (req, res) => {
