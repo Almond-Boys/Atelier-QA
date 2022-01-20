@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Almond-Boys/QA-Almond#readme",
   "dependencies": {
     "express": "^4.17.2",
+    "newrelic": "^8.7.1",
     "pg": "^8.7.1"
   },
   "devDependencies": {
