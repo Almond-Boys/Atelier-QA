@@ -1,17 +1,15 @@
-const db = require('../QA-Almond/database/index.js');
+const db = require('../../database/index.js');
 
 // questionsGet query
-const sendQuestions = (req, res) => {
-  const count = req.query.count;
-  const product_id = req.query.product_id;
+const sendQuestions = (callback, request) => {
+  const count = request.query.count;
+  const product_id = request.query.product_id;
   const questionQuery = `SELECT
                       product_id,
                       json_agg(
                         json_build_object(
-                          'question_id', q.id,
-                          'question_body', q.question_body,
-                          'question_date', q.question_date,
-                          'asker_name', q.question_asker,
+                          'question_id', q.id, 'question_body', q.question_body,
+                          'question_date', q.question_date, 'asker_name', q.question_asker,
                           'question_helpfulness', q.question_helpfulness,
                           'reported', q.question_reported,
                           'answers', (
@@ -21,11 +19,8 @@ const sendQuestions = (req, res) => {
                                 json_object_agg(
                                   id,
                                   json_build_object(
-                                    'id', id,
-                                    'body', answer_body,
-                                    'date', answer_date,
-                                    'answerer_name', answerer_name,
-                                    'helpfulness', answer_helpfulness,
+                                    'id', id, 'body', answer_body, 'date', answer_date,
+                                    'answerer_name', answerer_name, 'helpfulness', answer_helpfulness,
                                     'photos', (
                                       SELECT coalesce(photos, '[]')
                                       FROM (
@@ -50,13 +45,15 @@ const sendQuestions = (req, res) => {
                     ) as q
                     GROUP BY 1`;
 
-  db.query(questionQuery, (err, results, fields) => res.send(results.rows));
+  db.query(questionQuery, (err, results, fields) => {
+    callback(err, results.rows);
+  });
 };
 
-const sendAnswers = (req, res) => {
-  const count = req.query.count;
-  const question_id = req.params.question_id;
-  // const answerString = `SELECT * FROM answers WHERE question_id = ${question_id} AND answer_reported = FALSE `;
+const sendAnswers = (callback, request) => {
+  const count = request.query.count;
+  const question_id = request.params.question_id;
+
   const answerString = `SELECT
   json_agg(
     json_build_object(
@@ -79,7 +76,7 @@ const sendAnswers = (req, res) => {
   WHERE question_id = ${question_id}`;
 
   db.query(answerString, (error, results, fields) => {
-    res.send({
+    callback(error, {
       question: question_id,
       page: 0,
       count: count,
@@ -89,11 +86,11 @@ const sendAnswers = (req, res) => {
 };
 // json build object
 
-const createQuestion = (req, res) => {
-  const textBody = req.body.body;
-  const user = req.body.name;
-  const email = req.body.email;
-  const product_id = req.body.product_id;
+const createQuestion = (callback, request) => {
+  const textBody = request.body.body;
+  const user = request.body.name;
+  const email = request.body.email;
+  const product_id = request.body.product_id;
 
   const questionString = `INSERT INTO questions(
     product_id, question_body, question_date, question_asker,
@@ -101,16 +98,16 @@ const createQuestion = (req, res) => {
     VALUES (${product_id}, '${textBody}', NOW(), '${user}', '${email}', 0, FALSE);`;
 
   db.query(questionString, (error, results, fields) => {
-    res.status(201).send('STATUS: 201 OK');
+    callback(error, 'STATUS: 201 OK');
   });
 };
 
-const createAnswer = (req, res) => {
-  const textBody = req.body.body;
-  const user = req.body.name;
-  const email = req.body.email;
-  const product_id = req.body.product_id;
-  const photos = req.body.photos; // this is an array of strings
+const createAnswer = (callback, request) => {
+  const textBody = request.body.body;
+  const user = request.body.name;
+  const email = request.body.email;
+  const product_id = request.body.product_id;
+  const photos = request.body.photos; // this is an array of strings
 
   const answerString = `INSERT INTO answers(
     answer_body, answer_date, answerer_name, answerer_email, answer_helpfulness, question_id, answer_reported)
@@ -118,46 +115,46 @@ const createAnswer = (req, res) => {
     '${user}', '${email}', 0, ${product_id}, FALSE);`;
 
   db.query(answerString, (error, results, fields) => {
-    res.status(201).send('STATUS: 201 OK');
+    callback(error, 'STATUS: 201 OK');
   });
 };
 
-const markQuestionHelpful = (req, res) => {
-  const id = req.params.question_id;
+const markQuestionHelpful = (callback, request) => {
+  const id = request.params.question_id;
   const helpfulString = `UPDATE questions SET question_helpfulness = question_helpfulness + 1 WHERE id = ${id}`;
 
-  db.query(helpfulString, (error, results, fields) =>
-    res.status(201).send('STATUS: 201 OK')
-  );
+  db.query(helpfulString, (error, results, fields) => {
+    callback(error, 'STATUS: 201 OK');
+  });
 };
 
-const reportQuestion = (req, res) => {
-  const id = req.params.question_id;
+const reportQuestion = (callback, request) => {
+  const id = request.params.question_id;
 
   const reportString = `UPDATE questions SET question_reported = TRUE WHERE id = ${id}`;
 
-  db.query(reportString, (error, results, fields) =>
-    res.status(204).send('STATUS: 204 NO CONTENT')
-  );
+  db.query(reportString, (error, results, fields) => {
+    callback(error, 'STATUS: 204 NO CONTENT');
+  });
 };
 
-const markAnswerHelpful = (req, res) => {
-  const id = req.params.answer_id;
+const markAnswerHelpful = (callback, request) => {
+  const id = request.params.answer_id;
   const helpfulString = `UPDATE answers SET answer_helpfulness = answer_helpfulness + 1 WHERE id = ${id}`;
 
-  db.query(helpfulString, (error, results, fields) =>
-    res.status(201).send('STATUS: 201 OK')
-  );
+  db.query(helpfulString, (error, results, fields) => {
+    callback(error, 'STATUS: 201 OK');
+  });
 };
 
 const reportAnswer = (req, res) => {
-  const id = req.params.answer_id;
+  const id = request.params.answer_id;
   const reportString = `UPDATE answers
   SET answer_reported = TRUE WHERE id = ${id}`;
 
-  db.query(reportString, (error, results, fields) =>
-    res.status(204).send('STATUS: 204 NO CONTENT')
-  );
+  db.query(reportString, (error, results, fields) => {
+    callback(error, 'STATUS: 204 NO CONTENT');
+  });
 };
 
 module.exports = {
