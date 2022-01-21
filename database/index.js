@@ -1,5 +1,4 @@
 const Pool = require('pg').Pool;
-require('newrelic');
 // create connection to postgresql database qa
 
 const pool = new Pool({

@@ -95,7 +95,7 @@ const createQuestion = (callback, request) => {
   const questionString = `INSERT INTO questions(
     product_id, question_body, question_date, question_asker,
     question_asker_email, question_helpfulness, question_reported)
-    VALUES (${product_id}, '${textBody}', NOW(), '${user}', '${email}', 0, FALSE);`;
+    VALUES (${product_id}, '${textBody}', NOW(), '${user}', '${email}', 0, FALSE)`;
 
   db.query(questionString, (error, results, fields) => {
     callback(error, 'STATUS: 201 OK');
@@ -103,16 +103,17 @@ const createQuestion = (callback, request) => {
 };
 
 const createAnswer = (callback, request) => {
+  console.log('PARAMS', request.params);
+  console.log('BODY', request.body);
   const textBody = request.body.body;
   const user = request.body.name;
   const email = request.body.email;
-  const product_id = request.body.product_id;
-  const photos = request.body.photos; // this is an array of strings
-
+  const question_id = request.params.question_id;
+  const photos = request.body.photos;
   const answerString = `INSERT INTO answers(
     answer_body, answer_date, answerer_name, answerer_email, answer_helpfulness, question_id, answer_reported)
     VALUES ('${textBody}', NOW(),
-    '${user}', '${email}', 0, ${product_id}, FALSE);`;
+    '${user}', '${email}', 0, ${question_id}, FALSE);`;
 
   db.query(answerString, (error, results, fields) => {
     callback(error, 'STATUS: 201 OK');
